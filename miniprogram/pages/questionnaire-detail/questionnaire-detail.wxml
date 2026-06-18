@@ -1,0 +1,35 @@
+<view class="detail-page">
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <view wx:elif="{{detail}}">
+    <view class="summary-card">
+      <view class="detail-title">{{detail.questionnaireName || detail.questionnaireCode}}</view>
+      <view class="detail-meta">{{statusText}} · {{updatedText}}</view>
+      <view class="code-line">{{detail.questionnaireCode}} / {{detail.templateVersion}}</view>
+    </view>
+
+    <view class="answers-section">
+      <view class="section-title">提问和结果</view>
+      <view class="answer-card" wx:for="{{answers}}" wx:key="questionId">
+        <view class="question-label">{{index + 1}}. {{item.label || item.questionId}}</view>
+        <view class="question-prompt">{{item.prompt}}</view>
+        <view class="answer-block">
+          <text class="answer-label">用户回答</text>
+          <text class="answer-value">{{item.rawText || '-'}}</text>
+        </view>
+        <view class="answer-block">
+          <text class="answer-label">结构化结果</text>
+          <text class="answer-value">{{item.value || item.selectedText || '-'}}</text>
+        </view>
+        <view class="answer-block" wx:if="{{item.attachmentSummary}}">
+          <text class="answer-label">附件</text>
+          <text class="answer-value">{{item.attachmentSummary}}</text>
+        </view>
+        <view class="answer-time">{{item.createdText}}</view>
+      </view>
+      <view class="empty-answers" wx:if="{{!answers.length}}">
+        暂无已保存答案
+      </view>
+    </view>
+  </view>
+</view>

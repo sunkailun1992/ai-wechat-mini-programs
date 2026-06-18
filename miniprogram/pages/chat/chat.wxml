@@ -1,0 +1,134 @@
+<view class="chat-page safe-bottom">
+  <view class="custom-nav" style="{{navBarStyle}}">
+    <view class="custom-nav-content" style="{{navContentStyle}}">
+      <view class="nav-menu-button" bindtap="openConversationDrawer">
+        <text class="nav-menu-icon">☰</text>
+      </view>
+      <text class="custom-nav-title">AI患者分析</text>
+    </view>
+  </view>
+  <view class="custom-nav-spacer" style="{{navSpacerStyle}}"></view>
+
+  <view class="drawer-mask" wx:if="{{conversationDrawerVisible}}" bindtap="closeConversationDrawer"></view>
+  <view class="conversation-drawer" wx:if="{{conversationDrawerVisible}}">
+    <view class="drawer-header">
+      <text class="drawer-title">AI患者分析</text>
+      <text class="drawer-subtitle">对话与问卷</text>
+    </view>
+    <scroll-view class="drawer-content" scroll-y>
+      <view class="drawer-section">
+        <view class="drawer-section-header">
+          <text class="drawer-section-title">对话列表</text>
+          <button class="drawer-new" bindtap="createConversationFromDrawer">+</button>
+        </view>
+        <view
+          class="drawer-item {{item.conversationId === currentConversationId ? 'active' : ''}}"
+          wx:for="{{conversations}}"
+          wx:key="conversationId"
+          data-id="{{item.conversationId}}"
+          data-title="{{item.title || '新对话'}}"
+          bindtap="selectConversation"
+        >
+          <view class="drawer-item-main">
+            <text class="drawer-item-title">{{item.title || '新对话'}}</text>
+            <text class="drawer-item-time">{{item.displayTime}}</text>
+          </view>
+          <button class="drawer-operation" data-id="{{item.conversationId}}" data-title="{{item.title || '新对话'}}" catchtap="openConversationActions">⋯</button>
+        </view>
+        <view class="drawer-empty" wx:if="{{!conversations.length}}">
+          <text>{{isLoggedIn ? '暂无对话' : '登录后查看对话'}}</text>
+        </view>
+      </view>
+      <view class="drawer-section questionnaire-section">
+        <view class="drawer-section-header">
+          <text class="drawer-section-title">问卷列表</text>
+        </view>
+        <view
+          class="drawer-questionnaire-item"
+          wx:for="{{questionnaires}}"
+          wx:key="questionnaireCode"
+          data-code="{{item.questionnaireCode}}"
+          bindtap="startQuestionnaire"
+        >
+          <text class="drawer-item-title">{{item.name || '问卷'}}</text>
+          <text class="drawer-item-time">{{item.scene || item.questionnaireCode}}</text>
+        </view>
+        <view class="drawer-empty" wx:if="{{!questionnaires.length}}">
+          <text>{{isLoggedIn ? '暂无启用问卷' : '登录后查看问卷'}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <scroll-view class="message-list" scroll-y scroll-with-animation scroll-into-view="{{scrollIntoView}}">
+    <view class="message {{item.role}}" wx:for="{{messages}}" wx:key="id" id="msg-{{item.id}}">
+      <view class="assistant-avatar" wx:if="{{item.role === 'assistant'}}">AI</view>
+      <view class="bubble">
+        <text user-select="{{true}}" wx:if="{{item.content}}">{{item.content}}</text>
+        <view class="message-attachments" wx:if="{{item.attachments && item.attachments.length}}">
+          <view
+            class="message-attachment {{attachment.previewType}}"
+            wx:for="{{item.attachments}}"
+            wx:for-item="attachment"
+            wx:key="fileId"
+            data-url="{{attachment.displayUrl}}"
+            data-mime="{{attachment.mimeType}}"
+            bindtap="previewAttachment"
+          >
+            <image wx:if="{{attachment.previewType === 'image'}}" class="attachment-image" src="{{attachment.displayUrl}}" mode="aspectFill" />
+            <view wx:else class="attachment-file">
+              <text class="attachment-name">{{attachment.originalName}}</text>
+              <text class="attachment-meta">{{attachment.mimeType}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class="typing" wx:if="{{sending}}">
+      <text>正在分析...</text>
+    </view>
+  </scroll-view>
+
+  <view class="composer">
+    <view class="questionnaire-mode-bar" wx:if="{{questionnaireMode}}">
+      <text class="questionnaire-mode-text">问卷进行中</text>
+      <button class="questionnaire-exit" disabled="{{sending}}" bindtap="exitQuestionnaire">退出</button>
+    </view>
+
+    <scroll-view class="pending-attachments" wx:if="{{pendingAttachments.length}}" scroll-x enable-flex>
+      <view class="pending-attachments-inner">
+        <view
+          class="pending-attachment"
+          wx:for="{{pendingAttachments}}"
+          wx:for-item="attachment"
+          wx:key="fileId"
+          data-url="{{attachment.displayUrl}}"
+          data-mime="{{attachment.mimeType}}"
+          bindtap="previewAttachment"
+        >
+          <image wx:if="{{attachment.previewType === 'image'}}" class="pending-thumb" src="{{attachment.displayUrl}}" mode="aspectFill" />
+          <view wx:else class="pending-file-icon">文</view>
+          <text class="pending-name">{{attachment.originalName}}</text>
+          <button class="pending-remove" data-index="{{index}}" catchtap="removePendingAttachment">×</button>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="input-bar">
+      <button class="attach-button" disabled="{{sending}}" bindtap="chooseAttachment">+</button>
+      <view class="input-shell" bindtap="handleInputTap">
+        <textarea
+          class="message-input"
+          value="{{inputValue}}"
+          placeholder="{{inputPlaceholder}}"
+          auto-height
+          maxlength="2000"
+          disabled="{{!isLoggedIn || sending}}"
+          bindinput="handleInput"
+          bindfocus="handleInputFocus"
+        />
+      </view>
+      <button class="send-button" disabled="{{sending}}" bindtap="sendMessage">{{isLoggedIn ? '发送' : '登录'}}</button>
+    </view>
+  </view>
+</view>

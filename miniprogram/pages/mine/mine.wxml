@@ -1,0 +1,57 @@
+<view class="mine-page">
+  <view class="profile-card">
+    <image class="avatar" src="{{userInfo.avatarUrl || '/images/avatar.png'}}"></image>
+    <view class="profile-main">
+      <view class="nickname">{{isLoggedIn ? (userInfo.nickname || '微信用户') : '未登录'}}</view>
+      <view class="summary">{{isLoggedIn ? 'AI患者分析助手账号' : '登录后同步对话和问卷进度'}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{!isLoggedIn}}" class="login-panel">
+    <button class="primary-button" bindtap="handleLogin">点击登录</button>
+  </view>
+
+  <view wx:else class="info-list">
+    <view class="info-item">
+      <text class="label">用户ID</text>
+      <text class="value">{{userInfo.id}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">性别</text>
+      <text class="value">{{genderText}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">最近登录</text>
+      <text class="value">{{lastLoginAt}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{isLoggedIn}}" class="questionnaire-panel">
+    <view class="section-header">
+      <text class="section-title">我的问卷</text>
+      <button class="section-refresh" bindtap="loadQuestionnaireRecords">刷新</button>
+    </view>
+    <view class="questionnaire-loading" wx:if="{{questionnaireLoading}}">加载中...</view>
+    <view
+      class="questionnaire-record"
+      wx:for="{{questionnaireRecords}}"
+      wx:key="sessionId"
+      data-id="{{item.sessionId}}"
+      bindtap="openQuestionnaireDetail"
+    >
+      <view class="record-main">
+        <view class="record-title">{{item.questionnaireName || item.questionnaireCode}}</view>
+        <view class="record-meta">{{item.statusText}} · 已答 {{item.answeredCount}} 题 · {{item.updatedText}}</view>
+      </view>
+      <view class="record-arrow">›</view>
+    </view>
+    <view class="empty-records" wx:if="{{!questionnaireLoading && !questionnaireRecords.length}}">
+      暂无问卷记录
+    </view>
+  </view>
+
+  <view wx:if="{{isLoggedIn}}" class="action-area">
+    <button class="secondary-button" bindtap="refreshProfile">刷新资料</button>
+    <button class="logout-button" bindtap="handleLogout">退出登录</button>
+  </view>
+</view>
