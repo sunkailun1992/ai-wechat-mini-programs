@@ -7,6 +7,26 @@ function authHeader() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+function trafficHeader() {
+  const app = getApp();
+  const globalData = app.globalData || {};
+  const releaseVersion = normalizeTrafficValue(globalData.releaseVersion) || "1.0.0";
+  const trafficLane = normalizeTrafficValue(globalData.trafficLane) || "stable";
+  const canaryTag = normalizeTrafficValue(globalData.canaryTag);
+  const canaryWeight = normalizeTrafficValue(globalData.canaryWeight);
+  return {
+    "X-Release-Version": releaseVersion,
+    "X-Traffic-Lane": trafficLane,
+    ...(canaryTag ? { "X-Canary-Tag": canaryTag } : {}),
+    ...(canaryWeight ? { "X-Canary-Weight": canaryWeight } : {}),
+  };
+}
+
+function normalizeTrafficValue(value) {
+  const normalized = typeof value === "string" ? value.trim() : "";
+  return /^[A-Za-z0-9._:-]{1,64}$/.test(normalized) ? normalized : "";
+}
+
 function request(options) {
   return new Promise((resolve, reject) => {
     wx.request({
@@ -15,6 +35,7 @@ function request(options) {
       data: options.data || {},
       header: {
         "content-type": "application/json",
+        ...trafficHeader(),
         ...authHeader(),
         ...(options.header || {}),
       },
@@ -87,6 +108,7 @@ function streamChat(payload, handlers) {
     header: {
       "content-type": "application/json",
       Accept: "text/event-stream",
+      ...trafficHeader(),
       ...authHeader(),
     },
     success(res) {
@@ -141,6 +163,7 @@ function streamQuestionnaire(payload, handlers) {
     header: {
       "content-type": "application/json",
       Accept: "text/event-stream",
+      ...trafficHeader(),
       ...authHeader(),
     },
     success(res) {
@@ -175,4 +198,5 @@ module.exports = {
   request,
   streamChat,
   streamQuestionnaire,
+  trafficHeader,
 };

@@ -1,6 +1,10 @@
 App({
   globalData: {
     backendBaseUrl: "http://localhost:8080",
+    releaseVersion: "1.0.0",
+    trafficLane: "stable",
+    canaryTag: "",
+    canaryWeight: "",
     conversationId: "",
     userInfo: null,
   },
