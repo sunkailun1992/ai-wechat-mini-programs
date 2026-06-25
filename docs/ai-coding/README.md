@@ -5,12 +5,14 @@
 ## 阅读顺序
 
 1. 先读 [分支管理规范](BRANCHING_SPEC.md)，确认分支命名、短分支生命周期、release/hotfix、tag 和清理规则。
-2. 再读 [项目版本变更规范](VERSIONING_SPEC.md)，确认小程序上传版本、后端公共包版本和 Java 新项目基础坐标的处理规则。
-3. 再读项目根目录 `README.md`、`project.config.json`、目标页面、工具方法或云函数。
+2. 再读 [环境配置入口规范](ENVIRONMENT_CONFIG_SPEC.md)，确认环境、Nacos namespace、Java profile 和小程序 API 地址边界。
+3. 再读 [项目版本变更规范](VERSIONING_SPEC.md)，确认小程序上传版本、后端公共包版本和 Java 新项目基础坐标的处理规则。
+4. 再读项目根目录 `README.md`、`project.config.json`、目标页面、工具方法或云函数。
 
 ## 必读结论
 
 - 小程序没有 Gradle `group`；如果涉及后端 Java 新项目，默认使用 `group = 'com'` 和 `version = '1.0.0'`。
 - 纯 README、AI 规范和说明文档改动不提升小程序上传版本。
 - 分支命名、短分支生命周期、release/hotfix、tag 和分支清理按 `BRANCHING_SPEC.md` 处理。
+- 环境、Nacos namespace、Java profile 和小程序 API 地址边界按 `ENVIRONMENT_CONFIG_SPEC.md` 处理。
 - 修改运行时代码、配置、接口地址、请求头、云函数或上传包行为时，按 `VERSIONING_SPEC.md` 的补丁递增规则处理版本。
