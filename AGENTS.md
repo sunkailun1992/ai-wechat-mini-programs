@@ -6,13 +6,15 @@
 
 1. `README.md`
 2. `docs/ai-coding/README.md`
-3. `docs/ai-coding/VERSIONING_SPEC.md`
-4. `project.config.json`
-5. 目标页面、工具方法、云函数或配置文件
+3. `docs/ai-coding/BRANCHING_SPEC.md`
+4. `docs/ai-coding/VERSIONING_SPEC.md`
+5. `project.config.json`
+6. 目标页面、工具方法、云函数或配置文件
 
 ## 版本规则
 
 - 小程序没有 Gradle `group`；如果涉及后端 Java 新项目，默认使用 `group = 'com'` 和 `version = '1.0.0'`。
+- 分支命名、短分支生命周期、release/hotfix、tag 和分支清理按 `docs/ai-coding/BRANCHING_SPEC.md` 处理。
 - 修改运行时代码、配置、请求头、接口地址、云函数或上传包行为时，按 `docs/ai-coding/VERSIONING_SPEC.md` 的补丁递增规则处理版本。
 - 纯 README、AI 规范、注释说明或非运行时文档改动不提升制品版本。
 
