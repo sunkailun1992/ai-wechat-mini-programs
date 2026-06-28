@@ -1,6 +1,6 @@
 App({
   globalData: {
-    backendBaseUrl: "http://localhost:8080",
+    backendBaseUrl: "http://localhost:7100",
     releaseVersion: "1.0.0",
     trafficLane: "stable",
     canaryTag: "",

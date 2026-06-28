@@ -35,7 +35,7 @@ Authorization: Bearer <authToken>
 默认后端地址在 `miniprogram/app.js`：
 
 ```js
-backendBaseUrl: "http://localhost:8080"
+backendBaseUrl: "http://localhost:7100"
 ```
 
 微信开发者工具本机调试可直接使用。真机调试需要改成局域网 IP 或已配置的小程序合法 HTTPS 域名。
