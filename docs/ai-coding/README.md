@@ -1,6 +1,6 @@
 # AI 编程规范入口
 
-本目录集中维护微信小程序项目的 AI 编程规范。当前只补充跨项目统一版本规则；后续新增小程序专项规范时，从本文件挂入口。
+本目录集中维护微信小程序项目的 AI 编程规范。维护版本、三条长期分支、清理与原生小程序环境边界。
 
 ## 阅读顺序
 
@@ -11,7 +11,8 @@
 
 ## 必读结论
 
-- 小程序没有 Gradle `group`；如果涉及后端 Java 新项目，默认使用 `group = 'com'` 和 `version = '1.0.0'`。
+- 长期保留 main/test/preprod；完整交付 main 并远端确认后才清理本任务短分支，保护未合入、dirty 与其他 worktree。详见分支规范。
+- 小程序继续使用原生 JavaScript/WXML/WXSS/JSON 与微信 API；后端 Java/Gradle/Maven 规则回到后端仓库。
 - 纯 README、AI 规范和说明文档改动不提升小程序上传版本。
 - 分支命名、短分支生命周期、release/hotfix、tag 和分支清理按 `BRANCHING_SPEC.md` 处理。
 - 环境、Nacos namespace、Java profile 和小程序 API 地址边界按 `ENVIRONMENT_CONFIG_SPEC.md` 处理。

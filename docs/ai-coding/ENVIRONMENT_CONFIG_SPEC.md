@@ -1,101 +1,22 @@
-# 环境配置入口规范
+# GitHub 前端环境配置规范
 
-本规范用于区分代码分支、部署环境、Nacos namespace 和运行时灰度治理。`main` 不是环境，Java 服务通过 Spring profile 选择 `dev`、`test`、`prod`，再由对应 profile 文件映射到 Nacos 地址和 namespace。
+代码长期保留 main/test/preprod；分支是集成与候选历史，实际构建、后端地址和部署环境独立选择，不能由分支名推断已部署。
 
-## Java 服务文件结构
+## 前端边界
 
-Java / Spring Boot 服务只保留以下本地入口文件：
+前端不直接连接 Nacos，不保存 Nacos 地址、namespace、数据库、Redis、MQ、对象存储私钥或生产密钥。后端连接与业务配置由对应 Java 服务和其独立 Nacos 环境管理；不要在前端创建 Java profile、DDL 或复制后端公共工具。
 
-```text
-src/main/resources/application.yml
-src/main/resources/application-dev.yml
-src/main/resources/application-test.yml
-src/main/resources/application-prod.yml
-```
+## 微信小程序入口
 
-职责划分：
+- API base URL 由现有 request 工具集中管理，页面不散写地址；上传使用服务端签发的完整表单和短期凭证，不在客户端生成存储签名。
+- 运行与上传设置以 project.config.json、现有工具和微信开发者工具为准；本机 project.private.config.json 不提交。
+- 不因 Java 后端采用 profile 或 Maven 引入对应构建结构；小程序继续使用 JavaScript、WXML、WXSS、JSON 和微信原生 API。
+- releaseVersion/上传版本、后端制品和存储元数据各自管理，不能靠分支名切换服务端数据范围。
 
-- `application.yml`：通用启动骨架，放 `server.port`、`spring.application.name`、`spring.profiles.active`、`spring.config.import`、Nacos config/discovery 绑定逻辑和 `custom.nacos-group`。
-- `application-dev.yml`：只放 dev 环境 Nacos `server-addr` 和 `namespace`。
-- `application-test.yml`：只放 test 环境 Nacos `server-addr` 和 `namespace`。
-- `application-prod.yml`：只放 prod 环境 Nacos `server-addr` 和 `namespace`。
+## 验证与发布
 
-禁止在 `application-dev.yml`、`application-test.yml`、`application-prod.yml` 中放数据库、Redis、MQ、OSS、模型密钥、业务参数、Dubbo 参数或路由规则；这些配置必须继续放 Nacos 对应 namespace 的 `DEFAULT_GROUP` dataId。
-
-## 启动方式
-
-启动时只需要传一个环境：
-
-```bash
-APP_ENV=test java -jar app.jar
-```
-
-或：
-
-```bash
-java -jar app.jar --spring.profiles.active=test
-```
-
-允许值：
-
-```text
-dev
-test
-prod
-```
-
-默认值为 `dev`，由 `application.yml` 中的 `${APP_ENV:dev}` 控制。
-
-## Nacos 映射规则
-
-当前 dev/test/prod 暂时共用同一套 Nacos 地址和 namespace；后期环境拆开时，只改对应 profile 文件或部署环境变量。
-
-环境变量优先级：
-
-```text
-dev:
-  NACOS_DEV_SERVER_ADDR -> NACOS_SERVER_ADDR -> 当前默认地址
-  NACOS_DEV_NAMESPACE   -> NACOS_NAMESPACE   -> 当前默认 namespace
-
-test:
-  NACOS_TEST_SERVER_ADDR -> NACOS_SERVER_ADDR -> 当前默认地址
-  NACOS_TEST_NAMESPACE   -> NACOS_NAMESPACE   -> 当前默认 namespace
-
-prod:
-  NACOS_PROD_SERVER_ADDR -> NACOS_SERVER_ADDR -> 当前默认地址
-  NACOS_PROD_NAMESPACE   -> NACOS_NAMESPACE   -> 当前默认 namespace
-```
-
-规则：
-
-- `spring.cloud.nacos.config.namespace` 和 `spring.cloud.nacos.discovery.namespace` 必须使用同一个 `custom.namespace`。
-- `spring.cloud.nacos.config.server-addr` 和 `spring.cloud.nacos.discovery.server-addr` 必须使用同一个 `custom.nacos-ip`。
-- Nacos group 统一为 `DEFAULT_GROUP`，默认由 `custom.nacos-group` 控制。
-- 不再用 `group=test` 表达环境。
-- 同名 dataId 在不同 namespace 保存不同环境值。
-
-## Prod 注意事项
-
-正式上线前必须确认：
-
-- `application-prod.yml` 或部署 Secret 已指向生产 Nacos 地址。
-- `application-prod.yml` 或部署 Secret 已指向 prod namespace。
-- prod namespace 中存在完整 dataId。
-- prod 的数据库、Redis、MQ、OSS、Seata、Dubbo、日志和告警配置与 test 隔离。
-- 不能让 prod 进程读取 test namespace，也不能让 test 进程注册到 prod discovery namespace。
-
-## 前端和小程序
-
-前端和小程序没有 Spring profile，不直接连接 Nacos。
-
-- 前端只配置网关地址、构建模式和请求头默认值。
-- 小程序只配置 API base URL、上传配置和请求头默认值。
-- 前端/小程序不能保存 Nacos 地址、namespace、数据库、Redis、MQ 或生产密钥。
-
-## 禁止事项
-
-- 禁止删除 `application.yml` 并在各环境文件重复 `spring.config.import`。
-- 禁止把业务配置从 Nacos 搬回本地 profile 文件。
-- 禁止用 Git 分支名区分 dev/test/prod。
-- 禁止 config namespace 和 discovery namespace 不一致。
-- 禁止在 prod profile 中默认指向 test Nacos 后仍声称已完成正式环境隔离；当前共用只允许作为上线前临时状态。
+- 开发、测试和正式网关按实际环境独立配置；不能把公司地址或业务配置复制到个人入口。
+- 前端展示、隐藏按钮和请求头不能替代后端身份、租户、权限与文件访问控制。
+- 测试使用假配置、mock/stub 和明确测试环境；普通测试不连接真实后端或生产环境。
+- 构建成功、上传成功、平台发布和真实设备验收分别报告；新建 test/preprod 分支不等于已有自动部署。
+- 本仓 CI/自动化入口以实际 workflow 或小程序平台任务为准，不继承公司 GitLab/Jenkins lane。

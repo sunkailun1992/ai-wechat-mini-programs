@@ -6,3 +6,6 @@ logs/
 *.log
 project.private.config.json
 miniprogram/envList.js
+
+### Generated artifacts ###
+*.class
