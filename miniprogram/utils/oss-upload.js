@@ -58,14 +58,15 @@ function uploadFileToOSS(file, fallbackType) {
 
 function uploadToOssHost(policy, picked) {
   return new Promise((resolve, reject) => {
-    const formData = {
+    const hasFormFields = policy.formFields && Object.keys(policy.formFields).length > 0;
+    const formData = hasFormFields ? { ...policy.formFields } : {
       key: policy.objectKey,
       policy: policy.policy,
       OSSAccessKeyId: policy.accessId,
       success_action_status: "200",
       signature: policy.signature,
     };
-    if (policy.securityToken) {
+    if (!hasFormFields && policy.securityToken) {
       formData["x-oss-security-token"] = policy.securityToken;
     }
     wx.uploadFile({
@@ -121,6 +122,7 @@ function completeUpload(policy, picked) {
       mimeType: policy.mimeType || picked.mimeType,
       fileType: policy.fileType || picked.fileType,
       fileSize: picked.size,
+      storagePlatform: policy.storagePlatform || null,
     },
   }).then((file) => {
     if (!file || !file.success) {
