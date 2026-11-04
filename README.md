@@ -1,6 +1,6 @@
 # AI 微信小程序
 
-患者分析助手小程序，后端接口使用 `/Users/sunkailun/Desktop/个人/GitHub/ai`。
+患者分析助手小程序，后端接口由 [ai](https://github.com/sunkailun1992/ai) 项目提供。
 
 ## 页面
 
